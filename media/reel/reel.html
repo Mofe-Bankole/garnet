@@ -1,0 +1,100 @@
+<!doctype html>
+<!--
+  15s motion-design showreel. Deterministic: window.render(t) draws frame at time t.
+  Pipeline per frame: scene → transition flashes → 3-sample motion blur → grain, vignette, letterbox, HUD.
+  Preview in real time: reel.html?play
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;500;800;900&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=block" rel="stylesheet" />
+<style>html,body{margin:0;background:#19171b;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script src="core.js"></script>
+<script src="scenes-a.js"></script>
+<script src="scenes-b.js"></script>
+<script>
+const out = document.getElementById("c").getContext("2d");
+const [acc, ax] = mk();
+const [grainC, gx] = mk();
+
+const SCENES = [[0, 2, s1], [2, 4, s2], [4, 6, s3], [6, 8.5, s4], [8.5, 11, s5], [11, 13, s6], [13, 15, s7]];
+
+function sceneAt(t) {
+  for (const [a, b, fn] of SCENES) if (t >= a && t < b) return [fn, t - a, a, b];
+  const l = SCENES[SCENES.length - 1]; return [l[2], Math.min(t, 15) - l[0], l[0], l[1]];
+}
+
+function drawScene(t) {
+  resetCtx(ctx);
+  const [fn, lt, a] = sceneAt(t);
+  ctx.save();
+  // camera: subtle push + shake on cuts
+  const sinceCut = t - a, shake = Math.max(0, 1 - sinceCut / 0.25) * (a > 0 ? 10 : 0);
+  const zoom = 1 + 0.025 * sinceCut;
+  ctx.translate(W / 2 + (hash(Math.floor(t * 60)) - 0.5) * shake, H / 2 + (hash(Math.floor(t * 60) + 9) - 0.5) * shake);
+  ctx.scale(zoom, zoom); ctx.translate(-W / 2, -H / 2);
+  fn(lt);
+  ctx.restore();
+  resetCtx(ctx);
+  // cut flash
+  const fl = Math.max(0, 1 - sinceCut / 0.12);
+  if (a > 0 && fl > 0) { ctx.globalAlpha = fl * 0.55; ctx.fillStyle = C.ivory; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+}
+
+function post(t) {
+  // grain
+  const r = rng(Math.floor(t * FPS) + 1);
+  gx.clearRect(0, 0, W, H);
+  for (let i = 0; i < 9000; i++) { gx.fillStyle = r() > 0.5 ? "rgba(247,239,234,0.07)" : "rgba(0,0,0,0.10)"; gx.fillRect(r() * W, r() * H, 2, 2); }
+  out.drawImage(grainC, 0, 0);
+  // vignette
+  const v = out.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 1.0);
+  v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(8,7,9,0.55)");
+  out.fillStyle = v; out.fillRect(0, 0, W, H);
+  // letterbox open/close
+  const lb = lerp(H / 2, 54, E.inOutExpo(seg(t, 0, 0.5))) + lerp(0, H / 2 - 54, E.inOutExpo(seg(t, 14.6, 15)));
+  out.fillStyle = "#0b0a0c"; out.fillRect(0, 0, W, lb); out.fillRect(0, H - lb, W, lb);
+  // HUD: timecode + progress
+  if (t > 0.45 && t < 14.7) {
+    out.font = '500 16px "Geist Mono"'; out.letterSpacing = "4px"; out.textBaseline = "middle"; out.fillStyle = "rgba(247,239,234,0.55)";
+    const fr = Math.floor(t * FPS), tc = `00:00:${String(Math.floor(t)).padStart(2, "0")}:${String(fr % FPS).padStart(2, "0")}`;
+    out.textAlign = "left"; out.fillText("● REC  " + tc, 40, 27);
+    out.textAlign = "right"; out.fillText("1920×1080 · 30FPS · GARNET STUDIO", W - 40, 27);
+    out.fillStyle = "rgba(247,239,234,0.15)"; out.fillRect(40, H - 28, W - 80, 2);
+    out.fillStyle = "#B7455D"; out.fillRect(40, H - 28, (W - 80) * (t / 15), 2);
+    SCENES.forEach(([a]) => { out.fillStyle = "rgba(247,239,234,0.5)"; out.fillRect(40 + (W - 80) * (a / 15), H - 33, 2, 12); });
+    out.letterSpacing = "0px";
+  }
+}
+
+const BLUR = new URLSearchParams(location.search).get("blur") === "0" ? 1 : 3;
+window.render = function (t) {
+  if (BLUR === 1) { drawScene(t); out.globalAlpha = 1; out.drawImage(buf, 0, 0); }
+  else {
+    ax.clearRect(0, 0, W, H);
+    for (let s = 0; s < BLUR; s++) {
+      drawScene(Math.max(0, t - (s / BLUR) * (0.5 / FPS)));
+      ax.globalAlpha = 1 / (s + 1); ax.drawImage(buf, 0, 0);
+    }
+    ax.globalAlpha = 1; out.globalAlpha = 1; out.drawImage(acc, 0, 0);
+  }
+  post(t);
+};
+
+window.ready = (async () => {
+  await document.fonts.ready;
+  await Promise.all(['900 340px Geist', '800 250px Geist', 'italic 380px "Instrument Serif"', '150px "Instrument Serif"', '500 22px "Geist Mono"'].map((f) => document.fonts.load(f)));
+  initP5();
+  window.render(0);
+  return document.fonts.check('900 40px Geist') && document.fonts.check('40px "Instrument Serif"');
+})();
+
+if (location.search.includes("play")) {
+  window.ready.then(() => { const t0 = performance.now(); const loop = () => { window.render(((performance.now() - t0) / 1000) % 15.5); requestAnimationFrame(loop); }; loop(); });
+}
+</script>
+</body>
+</html>
