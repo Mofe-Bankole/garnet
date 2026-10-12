@@ -1,0 +1,547 @@
+{
+  "recordedAt": "2026-10-12T00:41:16.633Z",
+  "scenario": "recovery",
+  "snapshot": {
+    "job": {
+      "id": "job_a5dfd201-f6a",
+      "status": "settled",
+      "stage": "finalize",
+      "planner": "scripted",
+      "faultInjection": true,
+      "contractHash": "sha256:cabe935cd51f6d6707cbe7decb88ccb470e43411e227f5d30b8dd5c94fa142d4",
+      "traceId": null,
+      "createdAt": "2026-10-12T00:41:14.196Z",
+      "updatedAt": "2026-10-12T00:41:16.631Z",
+      "outcome": {
+        "status": "settled",
+        "summary": "Verified analysis delivered by seller-b. Paid $0.65 of $1.50 budget (SIMULATED).",
+        "attempts": 2,
+        "recovered": true,
+        "paidTo": "seller-b",
+        "balances": {
+          "budgetMicro": "1500000",
+          "availableMicro": "850000",
+          "reservedMicro": "0",
+          "heldMicro": "0",
+          "releasedMicro": "650000",
+          "refundedMicro": "400000"
+        },
+        "paymentMode": "SIMULATED",
+        "planner": "scripted"
+      }
+    },
+    "contract": {
+      "version": "garnet.job/1",
+      "jobId": "job_a5dfd201-f6a",
+      "input": {
+        "txHash": "0xe29f23ac5fe63039eeb442bed3cf84d87c9b72893b00929e3082983e8548f320",
+        "chainId": 84532
+      },
+      "budgetMicro": "1500000",
+      "deadline": "2026-10-12T00:51:14.195Z",
+      "acceptanceCriteria": {
+        "fields": [
+          "txHash",
+          "chainId",
+          "from",
+          "to",
+          "blockNumber",
+          "status",
+          "valueWei"
+        ],
+        "rule": "Every listed field in the delivered analysis must equal the value independently fetched from the chain. Any mismatch fails. Any field that cannot be independently established is inconclusive; inconclusive work is never paid automatically."
+      },
+      "expectedResultSchema": "garnet.tx-analysis/1",
+      "evaluator": {
+        "id": "garnet-verifier/viem-rpc@1",
+        "independentOf": "seller",
+        "source": "rpc"
+      },
+      "idempotencyKey": "job:df3c8acb-373b-4f20-aa11-e40ebc3bb74d",
+      "createdAt": "2026-10-12T00:41:14.195Z"
+    },
+    "providers": [
+      {
+        "id": "seller-a",
+        "name": "Seller A · Quickscan",
+        "description": "Low-cost single-pass indexer. Fast, cheapest quote.",
+        "priceMicro": "400000",
+        "dataSource": "Base Sepolia RPC (seller-operated)",
+        "price": "$0.40"
+      },
+      {
+        "id": "seller-b",
+        "name": "Seller B · Deepledger",
+        "description": "Receipt-level analysis with log counts. Higher price.",
+        "priceMicro": "650000",
+        "dataSource": "Base Sepolia RPC (seller-operated)",
+        "price": "$0.65"
+      }
+    ],
+    "attempts": [
+      {
+        "id": "att_a5dfd201-f6a_1",
+        "seq": 1,
+        "providerId": "seller-a",
+        "quote": "$0.40",
+        "status": "refunded",
+        "decision": {
+          "action": "hire",
+          "providerId": "seller-a",
+          "reason": "Scripted policy: cheapest untried provider within budget ($0.40 of $1.50 available).",
+          "planner": "scripted",
+          "engagement": {
+            "version": "garnet.engagement/1",
+            "jobId": "job_a5dfd201-f6a",
+            "jobContractHash": "sha256:cabe935cd51f6d6707cbe7decb88ccb470e43411e227f5d30b8dd5c94fa142d4",
+            "attemptSeq": 1,
+            "seller": "seller-a",
+            "quotedFeeMicro": "400000",
+            "deadline": "2026-10-12T00:51:14.195Z",
+            "idempotencyKey": "job_a5dfd201-f6a:attempt:1"
+          }
+        },
+        "delivery": {
+          "schema": "garnet.tx-analysis/1",
+          "provider": "seller-a",
+          "analysis": {
+            "txHash": "0xe29f23ac5fe63039eeb442bed3cf84d87c9b72893b00929e3082983e8548f320",
+            "chainId": 84532,
+            "from": "0x586efe1d23d20266bc48235e655c8b8b248d012c",
+            "to": "0x5f9215dff5c01671e6e77469389d694ac4af2e97",
+            "blockNumber": "47997913",
+            "status": "success",
+            "valueWei": "40000000000000",
+            "gasUsed": "701748",
+            "logCount": 4,
+            "classification": "contract_call_with_value",
+            "methodSelector": "0xac9650d8",
+            "summary": "0x586e…012c called 0xac9650d8 on 0x5f92…2e97 in block 47997912; status success, 4 log(s), gas used 701748."
+          },
+          "producedAt": "2026-10-12T00:41:15.000Z"
+        },
+        "verification": {
+          "verdict": "FAIL",
+          "evaluator": "garnet-verifier/viem-rpc@1",
+          "source": {
+            "kind": "rpc",
+            "endpoint": "sepolia.base.org",
+            "chainId": 84532,
+            "fetchedAt": "2026-10-12T00:41:15.514Z"
+          },
+          "assertions": [
+            {
+              "field": "txHash",
+              "result": "PASS",
+              "expected": "0xe29f23ac5fe63039eeb442bed3cf84d87c9b72893b00929e3082983e8548f320",
+              "actual": "0xe29f23ac5fe63039eeb442bed3cf84d87c9b72893b00929e3082983e8548f320",
+              "source": "job contract + rpc:sepolia.base.org @ 2026-10-12T00:41:15.514Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "chainId",
+              "result": "PASS",
+              "expected": "84532",
+              "actual": "84532",
+              "source": "job contract + rpc:sepolia.base.org @ 2026-10-12T00:41:15.514Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "from",
+              "result": "PASS",
+              "expected": "0x586efe1d23d20266bc48235e655c8b8b248d012c",
+              "actual": "0x586efe1d23d20266bc48235e655c8b8b248d012c",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:15.514Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "to",
+              "result": "PASS",
+              "expected": "0x5f9215dff5c01671e6e77469389d694ac4af2e97",
+              "actual": "0x5f9215dff5c01671e6e77469389d694ac4af2e97",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:15.514Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "blockNumber",
+              "result": "FAIL",
+              "expected": "47997912",
+              "actual": "47997913",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:15.514Z",
+              "reason": "delivered value differs from independently fetched value"
+            },
+            {
+              "field": "status",
+              "result": "PASS",
+              "expected": "success",
+              "actual": "success",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:15.514Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "valueWei",
+              "result": "PASS",
+              "expected": "40000000000000",
+              "actual": "40000000000000",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:15.514Z",
+              "reason": "delivered value equals independently fetched value"
+            }
+          ],
+          "deliveryHash": "sha256:c44fdeff401adf722e03273065c3244a750543223f34d975d0ee7ebbc562058e",
+          "verifiedAt": "2026-10-12T00:41:15.004Z"
+        },
+        "dispute": {
+          "kind": "garnet.dispute/1",
+          "disputeId": "dsp_a5dfd201-f6a_1",
+          "jobId": "job_a5dfd201-f6a",
+          "attemptId": "att_a5dfd201-f6a_1",
+          "seller": "seller-a",
+          "jobContractHash": "sha256:cabe935cd51f6d6707cbe7decb88ccb470e43411e227f5d30b8dd5c94fa142d4",
+          "deliveryHash": "sha256:c44fdeff401adf722e03273065c3244a750543223f34d975d0ee7ebbc562058e",
+          "verdict": "FAIL",
+          "failedAssertions": [
+            {
+              "field": "blockNumber",
+              "result": "FAIL",
+              "expected": "47997912",
+              "actual": "47997913",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:15.514Z",
+              "reason": "delivered value differs from independently fetched value"
+            }
+          ],
+          "inconclusiveAssertions": [],
+          "source": {
+            "kind": "rpc",
+            "endpoint": "sepolia.base.org",
+            "chainId": 84532,
+            "fetchedAt": "2026-10-12T00:41:15.514Z"
+          },
+          "decision": "reject_and_refund",
+          "rule": "Objective mismatch against independently fetched chain data: reservation refunded to buyer, seller unpaid.",
+          "createdAt": "2026-10-12T00:41:15.516Z",
+          "packetHash": "sha256:42f6d72e72b27e729dc42ada92a874390fb5faacef06b13df284c42b7b2b6298"
+        }
+      },
+      {
+        "id": "att_a5dfd201-f6a_2",
+        "seq": 2,
+        "providerId": "seller-b",
+        "quote": "$0.65",
+        "status": "released",
+        "decision": {
+          "action": "hire",
+          "providerId": "seller-b",
+          "reason": "Scripted policy: cheapest untried provider within budget ($0.65 of $1.50 available).",
+          "planner": "scripted",
+          "engagement": {
+            "version": "garnet.engagement/1",
+            "jobId": "job_a5dfd201-f6a",
+            "jobContractHash": "sha256:cabe935cd51f6d6707cbe7decb88ccb470e43411e227f5d30b8dd5c94fa142d4",
+            "attemptSeq": 2,
+            "seller": "seller-b",
+            "quotedFeeMicro": "650000",
+            "deadline": "2026-10-12T00:51:14.195Z",
+            "idempotencyKey": "job_a5dfd201-f6a:attempt:2"
+          }
+        },
+        "delivery": {
+          "schema": "garnet.tx-analysis/1",
+          "provider": "seller-b",
+          "analysis": {
+            "txHash": "0xe29f23ac5fe63039eeb442bed3cf84d87c9b72893b00929e3082983e8548f320",
+            "chainId": 84532,
+            "from": "0x586efe1d23d20266bc48235e655c8b8b248d012c",
+            "to": "0x5f9215dff5c01671e6e77469389d694ac4af2e97",
+            "blockNumber": "47997912",
+            "status": "success",
+            "valueWei": "40000000000000",
+            "gasUsed": "701748",
+            "logCount": 4,
+            "classification": "contract_call_with_value",
+            "methodSelector": "0xac9650d8",
+            "summary": "0x586e…012c called 0xac9650d8 on 0x5f92…2e97 in block 47997912; status success, 4 log(s), gas used 701748."
+          },
+          "producedAt": "2026-10-12T00:41:16.060Z"
+        },
+        "verification": {
+          "verdict": "PASS",
+          "evaluator": "garnet-verifier/viem-rpc@1",
+          "source": {
+            "kind": "rpc",
+            "endpoint": "sepolia.base.org",
+            "chainId": 84532,
+            "fetchedAt": "2026-10-12T00:41:16.630Z"
+          },
+          "assertions": [
+            {
+              "field": "txHash",
+              "result": "PASS",
+              "expected": "0xe29f23ac5fe63039eeb442bed3cf84d87c9b72893b00929e3082983e8548f320",
+              "actual": "0xe29f23ac5fe63039eeb442bed3cf84d87c9b72893b00929e3082983e8548f320",
+              "source": "job contract + rpc:sepolia.base.org @ 2026-10-12T00:41:16.630Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "chainId",
+              "result": "PASS",
+              "expected": "84532",
+              "actual": "84532",
+              "source": "job contract + rpc:sepolia.base.org @ 2026-10-12T00:41:16.630Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "from",
+              "result": "PASS",
+              "expected": "0x586efe1d23d20266bc48235e655c8b8b248d012c",
+              "actual": "0x586efe1d23d20266bc48235e655c8b8b248d012c",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:16.630Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "to",
+              "result": "PASS",
+              "expected": "0x5f9215dff5c01671e6e77469389d694ac4af2e97",
+              "actual": "0x5f9215dff5c01671e6e77469389d694ac4af2e97",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:16.630Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "blockNumber",
+              "result": "PASS",
+              "expected": "47997912",
+              "actual": "47997912",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:16.630Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "status",
+              "result": "PASS",
+              "expected": "success",
+              "actual": "success",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:16.630Z",
+              "reason": "delivered value equals independently fetched value"
+            },
+            {
+              "field": "valueWei",
+              "result": "PASS",
+              "expected": "40000000000000",
+              "actual": "40000000000000",
+              "source": "rpc:sepolia.base.org @ 2026-10-12T00:41:16.630Z",
+              "reason": "delivered value equals independently fetched value"
+            }
+          ],
+          "deliveryHash": "sha256:cecb8da7ab94df686f55a4befb333258e2b556622463e7b8d05d0889b19b190b",
+          "verifiedAt": "2026-10-12T00:41:16.063Z"
+        },
+        "dispute": null
+      }
+    ],
+    "balances": {
+      "budget": "$1.50",
+      "available": "$0.85",
+      "reserved": "$0.00",
+      "held": "$0.00",
+      "released": "$0.65",
+      "refunded": "$0.40"
+    },
+    "receipts": [
+      {
+        "mode": "SIMULATED",
+        "receiptId": "sim_budget_691f1dbd",
+        "op": "budget",
+        "jobId": "job_a5dfd201-f6a",
+        "reservationId": null,
+        "payee": null,
+        "amountMicro": "1500000",
+        "idempotencyKey": "job_a5dfd201-f6a:budget",
+        "at": "2026-10-12T00:41:14.197Z",
+        "note": "SIMULATED — Buyer budget recorded in simulated escrow account."
+      },
+      {
+        "mode": "SIMULATED",
+        "receiptId": "sim_reserve_55bdd8ec",
+        "op": "reserve",
+        "jobId": "job_a5dfd201-f6a",
+        "reservationId": "res_22f2bc5d-d07d-4272-866c-85df313d7c1e",
+        "payee": "seller-a",
+        "amountMicro": "400000",
+        "idempotencyKey": "att_a5dfd201-f6a_1:reserve",
+        "at": "2026-10-12T00:41:14.203Z",
+        "note": "SIMULATED — Funds reserved for seller-a. Not yet payable."
+      },
+      {
+        "mode": "SIMULATED",
+        "receiptId": "sim_refund_d19d80a4",
+        "op": "refund",
+        "jobId": "job_a5dfd201-f6a",
+        "reservationId": "res_22f2bc5d-d07d-4272-866c-85df313d7c1e",
+        "payee": null,
+        "amountMicro": "400000",
+        "idempotencyKey": "att_a5dfd201-f6a_1:refund",
+        "at": "2026-10-12T00:41:15.520Z",
+        "note": "SIMULATED — Reservation refunded to buyer budget. Seller unpaid."
+      },
+      {
+        "mode": "SIMULATED",
+        "receiptId": "sim_reserve_98e89c22",
+        "op": "reserve",
+        "jobId": "job_a5dfd201-f6a",
+        "reservationId": "res_d6aea8ed-5aba-4e26-bdf7-16f7893edcd3",
+        "payee": "seller-b",
+        "amountMicro": "650000",
+        "idempotencyKey": "att_a5dfd201-f6a_2:reserve",
+        "at": "2026-10-12T00:41:15.523Z",
+        "note": "SIMULATED — Funds reserved for seller-b. Not yet payable."
+      },
+      {
+        "mode": "SIMULATED",
+        "receiptId": "sim_release_e000032f",
+        "op": "release",
+        "jobId": "job_a5dfd201-f6a",
+        "reservationId": "res_d6aea8ed-5aba-4e26-bdf7-16f7893edcd3",
+        "payee": "seller-b",
+        "amountMicro": "650000",
+        "idempotencyKey": "att_a5dfd201-f6a_2:release",
+        "at": "2026-10-12T00:41:16.630Z",
+        "note": "SIMULATED — Payment released to seller-b after verification PASS."
+      }
+    ],
+    "events": [
+      {
+        "seq": 1,
+        "ts": "2026-10-12T00:41:14.198Z",
+        "stage": "intake",
+        "type": "contract_frozen",
+        "message": "Job contract frozen (sha256:cabe935cd51f…). Budget $1.50 recorded in SIMULATED escrow."
+      },
+      {
+        "seq": 2,
+        "ts": "2026-10-12T00:41:14.198Z",
+        "stage": "intake",
+        "type": "demo_fault_armed",
+        "message": "DEMO ONLY: Seller A fault injection armed. Seller A will corrupt one field; Garnet is not told which."
+      },
+      {
+        "seq": 3,
+        "ts": "2026-10-12T00:41:14.202Z",
+        "stage": "select_provider",
+        "type": "decision",
+        "message": "Scripted planner (no LLM key): hire seller-a — Scripted policy: cheapest untried provider within budget ($0.40 of $1.50 available)."
+      },
+      {
+        "seq": 4,
+        "ts": "2026-10-12T00:41:14.203Z",
+        "stage": "create_contract",
+        "type": "engagement",
+        "message": "Engaged Seller A · Quickscan for $0.40 (attempt 1). Acceptance criteria unchanged."
+      },
+      {
+        "seq": 5,
+        "ts": "2026-10-12T00:41:14.204Z",
+        "stage": "reserve",
+        "type": "reserved",
+        "message": "SIMULATED escrow reserved $0.40 for seller-a. Not payable until verification passes."
+      },
+      {
+        "seq": 6,
+        "ts": "2026-10-12T00:41:15.001Z",
+        "stage": "seller_execute",
+        "type": "delivered",
+        "message": "Seller A · Quickscan delivered an analysis in 796 ms. Treating it as untrusted until verified."
+      },
+      {
+        "seq": 7,
+        "ts": "2026-10-12T00:41:15.002Z",
+        "stage": "seller_execute",
+        "type": "demo_fault_applied",
+        "message": "DEMO FAULT INJECTION applied inside Seller A (hidden from verifier): blockNumber 47997912 → 47997913."
+      },
+      {
+        "seq": 8,
+        "ts": "2026-10-12T00:41:15.515Z",
+        "stage": "verify",
+        "type": "verify_fail",
+        "message": "Independent verification FAIL: blockNumber expected 47997912, got 47997913."
+      },
+      {
+        "seq": 9,
+        "ts": "2026-10-12T00:41:15.516Z",
+        "stage": "create_dispute",
+        "type": "dispute_created",
+        "message": "Evidence packet dsp_a5dfd201-f6a_1 sealed (sha256:42f6d72e72b2…): Objective mismatch against independently fetched chain data: reservation refunded to buyer, seller unpaid."
+      },
+      {
+        "seq": 10,
+        "ts": "2026-10-12T00:41:15.520Z",
+        "stage": "refund_or_release",
+        "type": "refunded",
+        "message": "SIMULATED refund of $0.40 returned to budget. seller-a unpaid."
+      },
+      {
+        "seq": 11,
+        "ts": "2026-10-12T00:41:15.522Z",
+        "stage": "fallback",
+        "type": "fallback_started",
+        "message": "Previous attempt rejected. Re-planning under the same budget: $1.50 of $1.50 available."
+      },
+      {
+        "seq": 12,
+        "ts": "2026-10-12T00:41:15.522Z",
+        "stage": "fallback",
+        "type": "decision",
+        "message": "Scripted planner (no LLM key): hire seller-b — Scripted policy: cheapest untried provider within budget ($0.65 of $1.50 available)."
+      },
+      {
+        "seq": 13,
+        "ts": "2026-10-12T00:41:15.523Z",
+        "stage": "create_contract",
+        "type": "engagement",
+        "message": "Engaged Seller B · Deepledger for $0.65 (attempt 2). Acceptance criteria unchanged."
+      },
+      {
+        "seq": 14,
+        "ts": "2026-10-12T00:41:15.524Z",
+        "stage": "reserve",
+        "type": "reserved",
+        "message": "SIMULATED escrow reserved $0.65 for seller-b. Not payable until verification passes."
+      },
+      {
+        "seq": 15,
+        "ts": "2026-10-12T00:41:16.061Z",
+        "stage": "seller_execute",
+        "type": "delivered",
+        "message": "Seller B · Deepledger delivered an analysis in 536 ms. Treating it as untrusted until verified."
+      },
+      {
+        "seq": 16,
+        "ts": "2026-10-12T00:41:16.630Z",
+        "stage": "verify",
+        "type": "verify_pass",
+        "message": "Independent verification PASS: 7/7 fields match rpc data from sepolia.base.org."
+      },
+      {
+        "seq": 17,
+        "ts": "2026-10-12T00:41:16.631Z",
+        "stage": "refund_or_release",
+        "type": "released",
+        "message": "SIMULATED payment of $0.65 released to seller-b — exactly once, after PASS."
+      },
+      {
+        "seq": 18,
+        "ts": "2026-10-12T00:41:16.631Z",
+        "stage": "finalize",
+        "type": "job_settled",
+        "message": "Verified analysis delivered by seller-b. Paid $0.65 of $1.50 budget (SIMULATED)."
+      }
+    ],
+    "modes": {
+      "payment": "SIMULATED",
+      "verifier": "rpc",
+      "planner": "scripted",
+      "telemetry": {
+        "enabled": false,
+        "reason": "NEATLOGS_API_KEY not set — traces not exported"
+      }
+    }
+  }
+}

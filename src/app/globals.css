@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
+@theme {
+  --color-graphite: #19171b;
+  --color-graphite-2: #211e24;
+  --color-graphite-3: #2b272e;
+  --color-garnet: #982e48;
+  --color-garnet-vivid: #b7455d;
+  --color-ivory: #f7efea;
+  --color-ivory-2: #efe4dd;
+  --color-rose: #e68b9b;
+  --color-pass: #8fc9a3;
+  --color-warn: #e8c37a;
+
+  --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-editorial), ui-serif, Georgia, serif;
+  --font-mono: var(--font-code), ui-monospace, SFMono-Regular, monospace;
+
+  --ease-garnet: cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-graphite);
+  color: var(--color-ivory);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-garnet);
+  color: var(--color-ivory);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-rose);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Structural hairlines */
+.hairline {
+  border-color: rgb(247 239 234 / 0.12);
+}
+.hairline-dark {
+  border-color: rgb(25 23 27 / 0.14);
+}
+
+/* Faceted grid backdrop: thin lines, no glow */
+.facet-grid {
+  background-image:
+    linear-gradient(rgb(247 239 234 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(247 239 234 / 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 40%, transparent 100%);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 520ms var(--ease-garnet) both;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.pulse-dot {
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: var(--len, 200);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.draw {
+  stroke-dasharray: var(--len, 200);
+  animation: draw 1.6s var(--ease-garnet) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

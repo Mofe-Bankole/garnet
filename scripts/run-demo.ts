@@ -3,7 +3,7 @@
  *   npm run demo -- --scenario happy|recovery [--tx 0x...] [--budget 1.50] [--fixture]
  * Loads .env.local if present. Prints the event trail, balances and trace id.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 function loadEnv() {
   for (const f of [".env.local", ".env"]) {
@@ -45,6 +45,11 @@ async function main() {
     for (const e of s.events) console.log(`  ${String(e.seq).padStart(2)} [${e.stage}] ${e.message}`);
     console.log(`\nbalances: ${JSON.stringify(s.balances)}`);
     console.log(`outcome: ${s.job.status} — ${s.job.outcome?.summary}  (${Date.now() - t0} ms)`);
+    const save = arg("save");
+    if (save) {
+      writeFileSync(save, JSON.stringify({ recordedAt: new Date().toISOString(), scenario, snapshot: s }, null, 2) + "\n");
+      console.log(`saved snapshot → ${save}`);
+    }
     console.log(JSON.stringify({ jobId: s.job.id, status: s.job.status, attempts: s.attempts.length, released: s.balances.released, refunded: s.balances.refunded, traceId: s.job.traceId, planner: s.modes.planner, latencyMs: Date.now() - t0 }));
   } finally {
     await shutdownTelemetry();
