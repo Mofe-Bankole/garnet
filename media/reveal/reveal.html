@@ -1,0 +1,238 @@
+<!doctype html>
+<!--
+  Garnet — 10s brand reveal. Deterministic: frames are rendered by calling window.render(t) (seconds).
+  Rendered to MP4 by scripts/render-reveal.mjs. Open in a browser with ?play to preview in real time.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400&display=block" rel="stylesheet" />
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #19171b; }
+  svg { display: block; }
+  .serif { font-family: "Instrument Serif", Georgia, serif; }
+  .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+</style>
+</head>
+<body>
+<svg id="stage" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <radialGradient id="light" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#B7455D" stop-opacity="0.55" />
+      <stop offset="0.45" stop-color="#982E48" stop-opacity="0.16" />
+      <stop offset="1" stop-color="#19171b" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="glint" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F7EFEA" stop-opacity="0" />
+      <stop offset="0.5" stop-color="#F7EFEA" stop-opacity="0.75" />
+      <stop offset="1" stop-color="#F7EFEA" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#E68B9B" stop-opacity="0" />
+      <stop offset="0.5" stop-color="#E68B9B" stop-opacity="0.22" />
+      <stop offset="1" stop-color="#E68B9B" stop-opacity="0" />
+    </linearGradient>
+    <clipPath id="hexclip"><path d="M16 2 28.1 9v14L16 30 3.9 23V9Z" /></clipPath>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M64 0H0V64" fill="none" stroke="#F7EFEA" stroke-opacity="0.05" stroke-width="1" />
+    </pattern>
+    <radialGradient id="vignette" cx="50%" cy="46%" r="65%">
+      <stop offset="0.55" stop-color="#19171b" stop-opacity="0" />
+      <stop offset="1" stop-color="#0e0d10" stop-opacity="0.9" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#19171b" />
+  <rect id="grid" width="1920" height="1080" fill="url(#grid)" opacity="0" />
+  <rect id="sweepBar" x="-700" y="0" width="700" height="1080" fill="url(#sweep)" transform="skewX(-14)" opacity="0" />
+  <ellipse id="glow" cx="960" cy="470" rx="620" ry="460" fill="url(#light)" opacity="0" />
+
+  <!-- thin structural lines -->
+  <line id="hl" x1="960" y1="540" x2="960" y2="540" stroke="#F7EFEA" stroke-opacity="0.16" stroke-width="1" />
+  <line id="vl" x1="960" y1="540" x2="960" y2="540" stroke="#F7EFEA" stroke-opacity="0.10" stroke-width="1" />
+
+  <!-- emblem (32-unit geometry scaled) -->
+  <g id="emblem" transform="translate(960 470)">
+    <g id="emblemScale">
+      <g transform="translate(-16 -16)">
+        <path id="fLeft"  d="M16 16 3.9 9v14L16 30Z" fill="#982E48" />
+        <path id="fTop"   d="M16 2 28.1 9 16 16 3.9 9Z" fill="#B7455D" />
+        <path id="fRight" d="M16 16 28.1 9v14L16 30Z" fill="#6F2034" />
+        <path id="edges" d="M16 16v14M16 16 3.9 9M16 16l12.1-7" fill="none" stroke="#F7EFEA" stroke-opacity="0.4" stroke-width="0.18" />
+        <path id="outline" d="M16 2 28.1 9v14L16 30 3.9 23V9Z" fill="none" stroke="#E68B9B" stroke-width="0.22" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" />
+        <g clip-path="url(#hexclip)">
+          <rect id="glintBar" x="-20" y="-4" width="9" height="40" fill="url(#glint)" transform="skewX(-18)" opacity="0" />
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- wordmark -->
+  <g id="word" class="serif" font-size="168" fill="#F7EFEA" text-anchor="middle"></g>
+
+  <!-- tagline -->
+  <text id="tag1" class="serif" x="960" y="842" font-size="46" fill="#F7EFEA" text-anchor="middle" opacity="0">Agents can transact.</text>
+  <text id="tag2" class="serif" x="960" y="900" font-size="46" fill="#E68B9B" text-anchor="middle" font-style="italic" opacity="0">Every outcome should be provable.</text>
+
+  <!-- steps -->
+  <g id="steps" class="mono" font-size="19" letter-spacing="6" text-anchor="middle"></g>
+
+  <rect width="1920" height="1080" fill="url(#vignette)" pointer-events="none" />
+  <rect id="fade" width="1920" height="1080" fill="#19171b" opacity="1" />
+</svg>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const seg = (t, a, b) => clamp((t - a) / (b - a));
+  const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+  const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  const easeOutBack = (x) => { const c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  const lerp = (a, b, x) => a + (b - a) * x;
+
+  // build wordmark letters
+  const WORD = "Garnet";
+  const wordG = $("word");
+  const NS = "http://www.w3.org/2000/svg";
+  const letters = [];
+  const tmp = document.createElementNS(NS, "text");
+  tmp.setAttribute("class", "serif"); tmp.setAttribute("font-size", "168"); tmp.textContent = WORD;
+  wordG.appendChild(tmp);
+
+  function layoutWord() {
+    const total = tmp.getComputedTextLength();
+    let x = 960 - total / 2;
+    for (let i = 0; i < WORD.length; i++) {
+      const sub = tmp.getSubStringLength(i, 1);
+      const el = document.createElementNS(NS, "text");
+      el.textContent = WORD[i];
+      el.setAttribute("x", x + sub / 2);
+      el.setAttribute("y", 760);
+      el.setAttribute("opacity", 0);
+      wordG.appendChild(el);
+      letters.push(el);
+      x += sub;
+    }
+    tmp.remove();
+  }
+
+  const STEPS = ["SELECT", "VERIFY", "SETTLE"];
+  const stepEls = [];
+  function layoutSteps() {
+    const g = $("steps");
+    const xs = [700, 960, 1220];
+    STEPS.forEach((s, i) => {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("x", xs[i]); t.setAttribute("y", 1000); t.setAttribute("fill", "#F7EFEA");
+      t.setAttribute("opacity", 0); t.textContent = s;
+      g.appendChild(t);
+      const d = document.createElementNS(NS, "rect");
+      d.setAttribute("width", 7); d.setAttribute("height", 7); d.setAttribute("fill", "#B7455D");
+      d.setAttribute("transform", `translate(${xs[i] - 82} 988) rotate(45)`); d.setAttribute("opacity", 0);
+      g.appendChild(d);
+      stepEls.push([t, d]);
+    });
+    [830, 1090].forEach((x) => {
+      const l = document.createElementNS(NS, "line");
+      l.setAttribute("x1", x - 30); l.setAttribute("x2", x + 30); l.setAttribute("y1", 994); l.setAttribute("y2", 994);
+      l.setAttribute("stroke", "#F7EFEA"); l.setAttribute("stroke-opacity", 0.25); l.setAttribute("opacity", 0);
+      l.dataset.connector = "1";
+      g.appendChild(l);
+      stepEls.push([l]);
+    });
+  }
+
+  window.render = function (t) {
+    // 0.0–0.8 fade in from black
+    $("fade").setAttribute("opacity", 1 - easeOut(seg(t, 0, 0.8)) + easeInOut(seg(t, 9.25, 10)));
+
+    // grid + structural lines
+    $("grid").setAttribute("opacity", 0.9 * easeOut(seg(t, 0.2, 2.0)) * (1 - 0.5 * seg(t, 5, 8)));
+    const hx = 760 * easeInOut(seg(t, 0.3, 1.8));
+    $("hl").setAttribute("x1", 960 - hx); $("hl").setAttribute("x2", 960 + hx);
+    $("hl").setAttribute("y1", 470); $("hl").setAttribute("y2", 470);
+    const vy = 420 * easeInOut(seg(t, 0.5, 2.0));
+    $("vl").setAttribute("y1", 470 - vy); $("vl").setAttribute("y2", 470 + vy);
+    const lineFade = 1 - easeOut(seg(t, 3.2, 4.6));
+    $("hl").setAttribute("opacity", lineFade); $("vl").setAttribute("opacity", lineFade);
+
+    // light sweep across the frame
+    const sw = seg(t, 0.6, 2.8);
+    $("sweepBar").setAttribute("x", lerp(-900, 2400, easeInOut(sw)));
+    $("sweepBar").setAttribute("opacity", Math.sin(Math.PI * sw));
+
+    // warm light behind the stone
+    const glowIn = easeOut(seg(t, 1.6, 4.0));
+    const breathe = 1 + 0.04 * Math.sin(t * 1.6);
+    $("glow").setAttribute("opacity", 0.9 * glowIn);
+    $("glow").setAttribute("rx", 620 * breathe); $("glow").setAttribute("ry", 460 * breathe);
+
+    // emblem: facets assemble
+    const s0 = lerp(10.5, 8.2, easeInOut(seg(t, 4.2, 5.6))); // shrink slightly when wordmark arrives
+    const ey = lerp(470, 420, easeInOut(seg(t, 4.2, 5.6)));
+    $("emblem").setAttribute("transform", `translate(960 ${ey})`);
+    $("glow").setAttribute("cy", ey);
+    $("emblemScale").setAttribute("transform", `scale(${s0})`);
+
+    const facet = (id, start, dx, dy) => {
+      const p = seg(t, start, start + 1.1);
+      const e = easeOutBack(p);
+      $(id).setAttribute("transform", `translate(${dx * (1 - e)} ${dy * (1 - e)})`);
+      $(id).setAttribute("opacity", easeOut(p));
+    };
+    facet("fTop", 1.5, 0, -7);
+    facet("fLeft", 1.75, -6.5, 3.5);
+    facet("fRight", 2.0, 6.5, 3.5);
+    $("edges").setAttribute("opacity", easeOut(seg(t, 2.8, 3.4)));
+    $("outline").setAttribute("stroke-dashoffset", 100 * (1 - easeInOut(seg(t, 2.4, 3.8))));
+    $("outline").setAttribute("stroke-opacity", 0.75 - 0.35 * seg(t, 4, 6));
+
+    // glint across the stone
+    const g = seg(t, 3.5, 4.5);
+    $("glintBar").setAttribute("x", lerp(-14, 40, easeInOut(g)));
+    $("glintBar").setAttribute("opacity", Math.sin(Math.PI * g));
+
+    // wordmark letters
+    letters.forEach((el, i) => {
+      const p = seg(t, 4.6 + i * 0.09, 5.5 + i * 0.09);
+      const e = easeOut(p);
+      el.setAttribute("opacity", e);
+      el.setAttribute("transform", `translate(0 ${18 * (1 - e)})`);
+      el.style.filter = `blur(${(1 - e) * 8}px)`;
+    });
+
+    // tagline
+    const t1 = easeOut(seg(t, 6.0, 6.8));
+    const t2 = easeOut(seg(t, 6.6, 7.4));
+    $("tag1").setAttribute("opacity", t1); $("tag1").setAttribute("transform", `translate(0 ${10 * (1 - t1)})`);
+    $("tag2").setAttribute("opacity", t2); $("tag2").setAttribute("transform", `translate(0 ${10 * (1 - t2)})`);
+
+    // steps
+    stepEls.forEach((arr, i) => {
+      const isConn = arr[0].dataset && arr[0].dataset.connector;
+      const start = isConn ? 7.75 + (i - 3) * 0.3 : 7.6 + i * 0.3;
+      const p = easeOut(seg(t, start, start + 0.5));
+      arr.forEach((el) => el.setAttribute("opacity", (isConn ? 1 : el.tagName === "rect" ? 1 : 0.75) * p));
+    });
+  };
+
+  window.ready = (async () => {
+    await document.fonts.ready;
+    await Promise.all([document.fonts.load('168px "Instrument Serif"'), document.fonts.load('19px "Geist Mono"')]);
+    layoutWord();
+    layoutSteps();
+    window.render(0);
+    return true;
+  })();
+
+  if (location.search.includes("play")) {
+    window.ready.then(() => {
+      const t0 = performance.now();
+      const loop = () => { const t = ((performance.now() - t0) / 1000) % 10.5; window.render(t); requestAnimationFrame(loop); };
+      loop();
+    });
+  }
+</script>
+</body>
+</html>

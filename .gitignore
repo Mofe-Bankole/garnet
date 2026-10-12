@@ -44,3 +44,4 @@ next-env.d.ts
 # garnet local state
 /data/*.db
 /data/*.db-*
+/media/.frames/
