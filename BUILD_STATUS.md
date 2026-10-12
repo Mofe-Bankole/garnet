@@ -1,29 +1,32 @@
 # Garnet — Build Status
 
-_Last updated: P0 (2026-10-12, ~01:15 WAT)_
-
-## Inventory at start
-- Folder contained only `Garnet_Opus_Master_Build_Payload.md`. No app code.
-- The folder sat inside an unrelated home-directory dotfiles Git repo (`/home/mofebanks`). Garnet now has its **own** Git repo (`main`) so history is genuine and isolated.
-- Env vars present (names only): none relevant. `ANTHROPIC_API_KEY`, `NEATLOGS_API_KEY`, `BASE_SEPOLIA_RPC_URL` are **not set**.
-- Tooling: Node 26.10 (built-in `node:sqlite`), npm 12, `gh` installed, `entire` CLI **not installed**.
+_Last updated: 2026-10-12 ~01:55 WAT. P0–P3 done; P4/P5 docs drafted. Waiting on human-provided keys and sponsor actions._
 
 ## Implemented
-- Next.js 16.4 App Router + TypeScript strict + Tailwind 4 scaffold (Cache Components on by default).
-- Deps: zod, viem, @anthropic-ai/sdk, neatlogs 1.1.28, vitest, tsx.
-- `.env.example`, `.gitignore` (env + local DB excluded), scripts `typecheck`, `test`, `demo`.
+- Frozen job contract + engagement hashes; explicit state machine; SQLite persistence (resumable).
+- Seller A / Seller B adapters (real Base Sepolia RPC or captured fixtures). Seller A has a labeled demo fault.
+- Independent viem verifier: PASS/FAIL/INCONCLUSIVE per field, with evidence packets.
+- SIMULATED escrow ledger: bigint, idempotent, one release per job (DB index), hold on inconclusive, reconcile on lost ack.
+- LLM planner (Opus 5.5 structured output) with deterministic guards; labeled scripted fallback.
+- Neatlogs instrumentation (WORKFLOW/AGENT/TOOL/GUARDRAIL/CHAIN), sanitized I/O.
+- API routes, `/demo` dashboard, landing page (Tempo × Kepler editorial direction, original emblem).
+- CLI `npm run demo`, benchmark `scripts/benchmark.ts`.
 
-## Verified
-- `next dev` serves `/` with HTTP 200.
+## Verified (commands run)
+- `npm test`: 37/37 pass (happy, recovery, budget stop, RPC down, wrong chain, unknown tx, concurrency, idempotency, crash-restart, lost ack, LLM guard cases, inputs, ledger invariants, span tree).
+- `npm run typecheck`, `eslint`: clean. `npm run build`: success.
+- Live Base Sepolia RPC recovery run via CLI and API; production-server restart preserved job state with 1 release.
+- Browser (Playwright): 360px and 1440px have no horizontal overflow and no console errors; CTA reaches /demo; Run Agent reaches settled; keyboard tab order is correct.
+- Benchmark (n=5×4, fixtures): baseline 5 false acceptances / 5 double-pay attempts / 0/5 recovery; Garnet 0 / 0 / 5/5.
 
 ## Simulated
-- Nothing yet. Escrow will be an explicitly SIMULATED ledger.
+- Escrow and payments (all receipts labeled SIMULATED).
+- Seller A fault (labeled DEMO FAULT INJECTION).
+- Planner is scripted until `ANTHROPIC_API_KEY` is set.
 
 ## Blocked / needs human
-- `ANTHROPIC_API_KEY` — required to demonstrate the real LLM agent (scripted fallback otherwise, labeled).
-- `NEATLOGS_API_KEY` — required for real traces.
-- Entire CLI not installed — needs human install/auth.
-- cfo.ai plan must be created by the human in the sponsor product.
-
-## Plan
-P1 vertical slice → P2 recovery + Neatlogs → P3 UI → P4 sponsor proof → P5 freeze.
+- `ANTHROPIC_API_KEY`: the real LLM agent has not been demonstrated yet.
+- `NEATLOGS_API_KEY`: no real Neatlogs trace exists yet. Instrumentation has only been verified locally (in-memory exporter, doctor --local pass).
+- Entire CLI is not installed. Needs a human to install and authenticate.
+- cfo.ai plan must be created by the human.
+- GitHub remote does not exist yet (gh is authenticated as Mofe-Bankole; I won't create a public repo without approval).
