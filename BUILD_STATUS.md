@@ -29,4 +29,4 @@ _Last updated: 2026-10-12 ~01:55 WAT. P0–P3 done; P4/P5 docs drafted. Waiting 
 - `NEATLOGS_API_KEY`: no real Neatlogs trace exists yet. Instrumentation has only been verified locally (in-memory exporter, doctor --local pass).
 - Entire CLI is not installed. Needs a human to install and authenticate.
 - cfo.ai plan must be created by the human.
-- GitHub remote does not exist yet (gh is authenticated as Mofe-Bankole; I won't create a public repo without approval).
+- Code pushed to https://github.com/Mofe-Bankole/garnet (main).

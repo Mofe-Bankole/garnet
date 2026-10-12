@@ -3,7 +3,7 @@
 Deadline: Mon 12 Oct 2026, 7:25 PM WAT (final cutoff per Discord). Planned feature freeze: 3:30 PM WAT.
 
 ## Links
-- Repo: _TODO (human: push to GitHub and paste URL; also set `NEXT_PUBLIC_REPO_URL`)_
+- Repo: https://github.com/Mofe-Bankole/garnet
 - Demo URL: _not deployed. Local demo only, unless the human approves a deployment with a managed DB_
 - Demo video: _TODO (human records it using docs/DEMO_SCRIPT.md)_
 - Neatlogs trace(s): _TODO: run with `NEATLOGS_API_KEY` set, then paste the trace IDs printed by `npm run demo` and shown in the /demo evidence trail_
@@ -19,7 +19,7 @@ Deadline: Mon 12 Oct 2026, 7:25 PM WAT (final cutoff per Discord). Planned featu
 - [ ] Add `NEATLOGS_API_KEY`, then run `npm run demo -- --scenario recovery` and `npx tsx scripts/benchmark.ts --n 5`; record the trace IDs here
 - [ ] Install and enable Entire (https://entire.io) for this repo; save checkpoints; verify the graph
 - [ ] Create the cfo.ai plan and attach an export or screenshot
-- [ ] Create the GitHub repo and push (`gh repo create garnet --public --source . --push`)
+- [x] Code pushed to https://github.com/Mofe-Bankole/garnet
 - [ ] Record the ≤3-minute demo
 - [ ] Post build-in-public updates and the quote-post (drafts below)
 - [ ] Submit the form

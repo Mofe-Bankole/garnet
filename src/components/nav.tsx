@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Wordmark } from "./brand";
 
-export const REPO_URL = process.env.NEXT_PUBLIC_REPO_URL || "https://github.com/";
+export const REPO_URL = process.env.NEXT_PUBLIC_REPO_URL || "https://github.com/Mofe-Bankole/garnet";
 
 export function Nav({ current }: { current?: "home" | "demo" }) {
   return (
