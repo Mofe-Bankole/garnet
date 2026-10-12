@@ -16,8 +16,19 @@ export function telemetryStatus() {
   return { enabled: state.enabled, reason: state.reason };
 }
 
-export async function initTelemetry(opts: { runtime: "server" | "cli" | "test" }): Promise<void> {
+export async function initTelemetry(opts: {
+  runtime: "server" | "cli" | "test";
+  /** Tests only: caller-owned provider with an in-memory exporter (no network). */
+  tracerProvider?: Parameters<typeof init>[0] extends infer O ? (O extends { tracerProvider?: infer P } ? P : never) : never;
+}): Promise<void> {
   if (state.initPromise) return state.initPromise;
+  if (opts.tracerProvider) {
+    state.initPromise = init({ apiKey: "test-local-only", workflowName: "garnet", disableExport: true, tracerProvider: opts.tracerProvider, registerShutdownHandlers: false }).then(() => {
+      state.enabled = true;
+      state.reason = "local in-memory capture (test)";
+    });
+    return state.initPromise;
+  }
   const apiKey = process.env.NEATLOGS_API_KEY;
   if (!apiKey || opts.runtime === "test") {
     state.enabled = false;
