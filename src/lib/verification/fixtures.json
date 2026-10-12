@@ -1,0 +1,59 @@
+[
+  {
+    "chainId": 84532,
+    "tx": {
+      "hash": "0xe29f23ac5fe63039eeb442bed3cf84d87c9b72893b00929e3082983e8548f320",
+      "from": "0x586efe1d23d20266bc48235e655c8b8b248d012c",
+      "to": "0x5f9215dff5c01671e6e77469389d694ac4af2e97",
+      "value": "40000000000000",
+      "blockNumber": "47997912",
+      "input": "0xac9650d8"
+    },
+    "receipt": {
+      "status": "success",
+      "blockNumber": "47997912",
+      "gasUsed": "701748",
+      "logCount": 4
+    },
+    "capturedAt": "2026-10-12T00:15:30.990Z",
+    "source": "https://sepolia.base.org"
+  },
+  {
+    "chainId": 84532,
+    "tx": {
+      "hash": "0x8575f7f21fa49d03dcb75dc3066c6f779b3dee6c5fca8d1a0d0d8457383344fb",
+      "from": "0x1cd9d2ac143949ebea9122ab6cbadbeee16c1089",
+      "to": "0x828fd8b3544021590ba9f9a994addb8b44ddd951",
+      "value": "0",
+      "blockNumber": "47997911",
+      "input": "0xd96ee754"
+    },
+    "receipt": {
+      "status": "success",
+      "blockNumber": "47997911",
+      "gasUsed": "53101",
+      "logCount": 1
+    },
+    "capturedAt": "2026-10-12T00:15:31.995Z",
+    "source": "https://sepolia.base.org"
+  },
+  {
+    "chainId": 84532,
+    "tx": {
+      "hash": "0x9434de5fb8919339cfe67d815c316914a4845d122ef551f35e9875f9addfda18",
+      "from": "0xb45ec65e25fc0146e92582798be2853ba4dd97e7",
+      "to": "0xfac638d51b769d060afc5953c41bf35595620b1c",
+      "value": "0",
+      "blockNumber": "47997910",
+      "input": "0xa65dbc99"
+    },
+    "receipt": {
+      "status": "success",
+      "blockNumber": "47997910",
+      "gasUsed": "70502",
+      "logCount": 1
+    },
+    "capturedAt": "2026-10-12T00:15:32.632Z",
+    "source": "https://sepolia.base.org"
+  }
+]
